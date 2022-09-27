@@ -28,8 +28,11 @@ import pandas as pd
 
 # region LOGGING
   #check for audit path
-today = date.datetime.now() - date.timedelta(days = 2)
-logpath = "/var/log/saki"+today.strftime('YYmmdd')+".log"
+today = date.datetime.now()
+enddate = "2022-08-31"
+#enddate = "YYYY-MM-DD" ---feel free to change this...
+
+logpath = "/var/log/saki-backfill-"+today.strftime('%Y%m%d')+".log"
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
     l = logging.getLogger(logger_name)
@@ -61,9 +64,9 @@ log.info(f"Starting: {starttime}")
 # region START
 path = "dotnet ~/DiscordChatExporter/DiscordChatExporter.Cli.dll"
 #yesterday = date.datetime.now() - date.timedelta(days = 1)
-yesterday = date.datetime.now() - date.timedelta(days = 3)
+yesterday = date.datetime.now() - date.timedelta(days = 365)
 
-outpath = "/var/www/html/raw/%G/%C/"
+outpath = "/var/www/html/backfill/%G/%C/"
 
 
 
@@ -107,10 +110,11 @@ for guild in guilds:
   log.info(f"##########################################")
   for channel in channels:
     channel = str(channel)
-    output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
-    cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+yesterday.strftime('%Y-%m-%d')+" --before "+today.strftime('%Y-%m-%d')+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
+    output = outpath+enddate.replace("-","")+"-"+channel+".csv"
+    #output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
+    cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+yesterday.strftime('%Y-%m-%d')+" --before "+enddate+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
   
-    log.info(f"Range: {yesterday}-{today}")
+    log.info(f"Range: {yesterday}-{enddate}")
     log.info(f"Channel: {channel}")
     log.info(f"Output: {output}")
     log.info(f"Complete.")
