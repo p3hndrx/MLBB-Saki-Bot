@@ -29,7 +29,7 @@ import pandas as pd
 # region LOGGING
   #check for audit path
 today = date.datetime.now()
-logpath = "/var/log/saki"+today.strftime('YYmmdd')+".log"
+logpath = "/var/log/saki-"+today.strftime("%Y%m%d")+".log
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
     l = logging.getLogger(logger_name)
