@@ -2,9 +2,16 @@
 
 import datetime as date
 from datetime import timedelta
+from dateutil import relativedelta
 
 import os
 from os.path import exists
+from dotenv import load_dotenv
+
+import subprocess
+
+import discord
+from discord.ext import commands
 
 import logging
 
@@ -19,11 +26,17 @@ import pandas as pd
 #bot = commands.Bot(command_prefix="/saki-stats ", intents=discord.Intents(messages=True, guilds=True))
 #bot.run(TOKEN)
 
+# region VARIABLES
+path = "dotnet ~/DiscordChatExporter/DiscordChatExporter.Cli.dll"
+# endregion
 
 # region LOGGING
   #check for audit path
-today = date.datetime.now() - date.timedelta(days = 2)
-logpath = "/var/log/saki-monthly-backfill-"+today.strftime('%Y%m%d')+".log"
+today = date.datetime.now()
+enddate = "2022-08-31"
+#enddate = "YYYY-MM-DD" ---feel free to change this...
+
+logpath = "/var/log/saki-backfill-"+today.strftime('%Y%m%d')+".log"
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
     l = logging.getLogger(logger_name)
@@ -41,9 +54,9 @@ setup_logger('log', logpath)
 log = logging.getLogger('log')
 
 
-log.info(f"##########################################")
-log.info(f"#### STARTING BACKLOG PARSER SCRAPER  ####")
-log.info(f"##########################################")
+log.info(f"################################")
+log.info(f"#### STARTING SAKI SCRAPER  ####")
+log.info(f"################################")
 
 starttime=date.datetime.now()
 log.info(f"Starting: {starttime}")
@@ -52,10 +65,86 @@ log.info(f"Starting: {starttime}")
 # endregion
 
 
+# region GUILDLIST
+#generate guilds list
+guildsfile = "/var/www/html/guilds.txt"
+
+log.info(f"#############################")
+log.info(f"#### Building Guild List ####")
+log.info(f"#############################")
+
+gcmd = path + " guilds"+" -t " + TOKEN + " > " + guildsfile  
+os.system(gcmd) 
+gdf = pd.read_csv(guildsfile, sep="|")
+gcol = gdf.iloc[:, 0]
+guilds = gcol.values.tolist()
+
+log.info(f"Guild List: {guilds}")
+# endregion
+
 # region START
 
+#startdate = date.datetime.now() - date.timedelta(days = 1)
+startdate = date.datetime.now() - date.timedelta(days = 365)
+
+outpath = "/var/www/html/backfill/%G/%C/"
+
+enddate = date.datetime.strptime(enddate, "%Y-%m-%d")
+delta = relativedelta.relativedelta(enddate, startdate)
+log.info(f'Backfill Months: {delta.months}')
 
 
+for x in range(delta.months):
+  log.info(x)
+  
+  scrapebegin = startdate + relativedelta.relativedelta(months = x) 
+  scrapebegin = date.date(scrapebegin.year, scrapebegin.month, 1)
+  #scrapeend   = startdate + relativedelta.relativedelta(months = x+1)
+  scrapeend = scrapebegin + relativedelta.relativedelta(day=+31)
+
+  log.info(f"Range: {scrapebegin} - {scrapeend}")
+  
+
+
+  input() 
 
 
 # endregion
+
+  log.info(f"#### Building Channel Lists")
+  for guild in guilds:
+    log.info(f" ## Populating GuildID: {guild}")
+    guild = str(guild)
+    channelfile = "/var/www/html/"+guild+"-channels.txt"
+    ccmd = path + " channels -g "+guild+" -t "+ TOKEN + " > " + channelfile
+    #os.system(ccmd)
+    log.info(f"Output: {channelfile}")
+    cdf = pd.read_csv(channelfile, sep="|")
+    ccol = cdf.iloc[:,0]
+    channels = ccol.values.tolist()
+    log.info(f"Channel List: {channels}")
+
+    #list channels:
+
+    #export guild
+
+    log.info(f"##########################################")
+    log.info(f"#### Starting Channel Parsing: {guild}####")
+    log.info(f"##########################################")
+    
+    for channel in channels:
+      channel = str(channel)
+
+      dt = scrapebegin.strftime('%Y%m')
+      output = outpath+dt+"-"+channel+".csv"
+      #output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
+      cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+scrapebegin.strftime('%Y-%m-%d')+" --before "+scrapeend.strftime('%Y-%m-%d')+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
+  
+      log.info(f"Range: {scrapebegin}-{scrapeend}")
+      log.info(f"Channel: {channel}")
+      log.info(f"Output: {output}")
+      log.info(f"Complete.")
+      #os.system(cmd)
+
+endtime=date.datetime.now()
+log.info(f"End: {endtime}")

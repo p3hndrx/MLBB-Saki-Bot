@@ -1,0 +1,7 @@
+
+        <dashboard version="2" theme="dark" hiddenElements="{&quot;hideEdit&quot;:false,&quot;hideOpenInSearch&quot;:false,&quot;hideExport&quot;:false}">
+            <label>UMLBB Dashboard</label>
+            <description></description>
+            <definition><![CDATA[{"visualizations":{},"dataSources":{},"defaults":{"dataSources":{"ds.search":{"options":{"queryParameters":{"latest":"$global_time.latest$","earliest":"$global_time.earliest$"}}}}},"inputs":{"input_global_trp":{"type":"input.timerange","options":{"token":"global_time","defaultValue":"-24h@h,now"},"title":"Global Time Range"}},"layout":{"type":"grid","options":{},"structure":[],"globalInputs":["input_global_trp"]},"description":"","title":"UMLBB Dashboard"}]]></definition>
+            <assets><![CDATA[{}]]></assets>
+        </dashboard>

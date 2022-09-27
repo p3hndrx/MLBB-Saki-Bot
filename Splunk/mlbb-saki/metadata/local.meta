@@ -1,0 +1,37 @@
+[app/ui]
+version = 9.0.1
+modtime = 1662743540.323726000
+
+[app/launcher]
+version = 9.0.1
+modtime = 1662743540.329940000
+
+[indexes/discordchatexporter]
+owner = admin
+version = 9.0.1
+modtime = 1662747122.865917000
+
+[inputs/monitor%3A%2F%2F%2Fvar%2Fwww%2Fhtml%2Fraw%2F%2A%2F%2A%2F%2A.csv]
+owner = admin
+version = 9.0.1
+modtime = 1662757359.617872000
+
+[inputs/monitor%3A%2F%2F%2Fvar%2Fwww%2Fhtml%2Ffull]
+owner = admin
+version = 9.0.1
+modtime = 1662748033.635994000
+
+[indexes/discordpy-extract]
+owner = admin
+version = 9.0.1
+modtime = 1662756295.999117000
+
+[inputs/monitor%3A%2F%2F%2Fvar%2Fwww%2Fhtml%2Fmemberlist-%2A.csv]
+owner = admin
+version = 9.0.1
+modtime = 1662757368.994806000
+
+[views/umlbb_dashboard]
+owner = admin
+version = 9.0.1
+modtime = 1663616866.058442000
