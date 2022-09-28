@@ -53,15 +53,23 @@ files_path = [os.path.join(rawpath,x) for x in guilds]
 log.info(files_path)
 
 for guild in files_path:
-    channels = os.listdir(guild)
+    categories = os.listdir(guild)
     log.info(f"Guild:: {guild}")
-    log.info(f"Channels:\n{channels}")
-    channels_path = [os.path.join(rawpath,guild,channel) for channel in channels]
-    
+    log.info(f"Categories: \n{categories}")
+    categories_path = [os.path.join(rawpath,guild,category) for category in categories]
     log.info(f"Paths:\n")
-    log.info(channels_path)
+    log.info(categories_path)
 
-    for c in channels_path:
+    for cat in categories_path:
+      channels = os.listdir(cat)
+      log.info(f"Channels:\n{channels}")
+      channels_path = [os.path.join(rawpath,guild,cat,channel) for channel in channels]
+    
+      log.info(f"Paths:\n")
+      log.info(channels_path)
+    
+
+      for c in channels_path:
         logs = os.listdir(c)
         #log.info(logs)
         log.info(f"Selecting:\n {c}/{lm}*")
@@ -73,12 +81,14 @@ for guild in files_path:
           log.info(f"Channel is empty for {lm}... Skipping...")
 
         else:
-          logs_path = [os.path.join(guild,c,k) for k in lm_log]
+          logs_path = [os.path.join(guild,cat,c,k) for k in lm_log]
           log.info(logs_path)
 
           log.info(f"Found: {count} logs")
-          files = os.path.join(rawpath,guild,c, f'{lm}*.csv')
+          files = os.path.join(rawpath,guild,cat,c,f'{lm}*')
+          log.info(f"Query: {files}")
           files = glob.glob(files)
+          log.info(f"Glob: {files}")
           df = pd.concat(map(pd.read_csv, files), ignore_index=True)
           log.info(df)
 

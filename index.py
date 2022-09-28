@@ -29,7 +29,7 @@ import pandas as pd
 # region LOGGING
   #check for audit path
 today = date.datetime.now()
-logpath = "/var/log/saki-"+today.strftime("%Y%m%d")+".log
+logpath = "/var/log/saki-"+today.strftime("%Y%m%d")+".log"
 
 def setup_logger(logger_name, log_file, level=logging.INFO):
     l = logging.getLogger(logger_name)
@@ -63,8 +63,8 @@ path = "dotnet ~/DiscordChatExporter/DiscordChatExporter.Cli.dll"
 #yesterday = date.datetime.now() - date.timedelta(days = 1)
 yesterday = date.datetime.now() - date.timedelta(days = 1)
 
-outpath = "/var/www/html/raw/%G/%C/"
-
+#outpath = "/var/www/html/raw/%G/%T/%C/"
+outpath = "/var/www/html/raw/%G_%g/%T_%t/%C_%c/"
 
 
 #generate guilds list
@@ -108,7 +108,7 @@ for guild in guilds:
   for channel in channels:
     channel = str(channel)
     output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
-    cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+yesterday.strftime('%Y-%m-%d')+" --before "+today.strftime('%Y-%m-%d')+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
+    cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+yesterday.strftime('%Y-%m-%d')+" --before "+today.strftime('%Y-%m-%d')+" -f Csv -o '"+output+"' -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
   
     log.info(f"Range: {yesterday}-{today}")
     log.info(f"Channel: {channel}")

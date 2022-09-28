@@ -66,7 +66,7 @@ path = "dotnet ~/DiscordChatExporter/DiscordChatExporter.Cli.dll"
 #yesterday = date.datetime.now() - date.timedelta(days = 1)
 yesterday = date.datetime.now() - date.timedelta(days = 365)
 
-outpath = "/var/www/html/backfill/%G/%C/"
+outpath = "/var/www/html/backfill/%G [%g]/%T [%t]/%C [%c]/"
 
 
 

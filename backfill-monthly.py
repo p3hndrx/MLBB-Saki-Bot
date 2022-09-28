@@ -2,7 +2,7 @@
 
 import datetime as date
 from datetime import timedelta
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 
 import os
 from os.path import exists
@@ -14,7 +14,7 @@ import discord
 from discord.ext import commands
 
 import logging
-
+today = date.datetime.now()
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -32,9 +32,6 @@ path = "dotnet ~/DiscordChatExporter/DiscordChatExporter.Cli.dll"
 
 # region LOGGING
   #check for audit path
-today = date.datetime.now()
-enddate = "2022-08-31"
-#enddate = "YYYY-MM-DD" ---feel free to change this...
 
 logpath = "/var/log/saki-backfill-"+today.strftime('%Y%m%d')+".log"
 
@@ -84,67 +81,62 @@ log.info(f"Guild List: {guilds}")
 
 # region START
 
-#startdate = date.datetime.now() - date.timedelta(days = 1)
-startdate = date.datetime.now() - date.timedelta(days = 365)
+#outpath = "/var/www/html/backfill/%G/%C/"
+outpath = "/var/www/html/monthly/%G [%g]/%T [%t]/%C [%c]/"
 
-outpath = "/var/www/html/backfill/%G/%C/"
+enddate = date.date(2022,8,31)
+startdate = enddate - relativedelta(years=2)
 
-enddate = date.datetime.strptime(enddate, "%Y-%m-%d")
-delta = relativedelta.relativedelta(enddate, startdate)
-log.info(f'Backfill Months: {delta.months}')
-
-
-for x in range(delta.months):
-  log.info(x)
-  
-  scrapebegin = startdate + relativedelta.relativedelta(months = x) 
-  scrapebegin = date.date(scrapebegin.year, scrapebegin.month, 1)
-  #scrapeend   = startdate + relativedelta.relativedelta(months = x+1)
-  scrapeend = scrapebegin + relativedelta.relativedelta(day=+31)
-
-  log.info(f"Range: {scrapebegin} - {scrapeend}")
-  
-
-
-  input() 
+log.info(f"Query Range: {startdate} - {enddate}")
+delta = relativedelta(enddate, startdate)
+delta = (delta.years * 12) + delta.months
+log.info(f'Backfill Months: {delta}')
 
 
 # endregion
 
-  log.info(f"#### Building Channel Lists")
-  for guild in guilds:
-    log.info(f" ## Populating GuildID: {guild}")
-    guild = str(guild)
-    channelfile = "/var/www/html/"+guild+"-channels.txt"
-    ccmd = path + " channels -g "+guild+" -t "+ TOKEN + " > " + channelfile
-    #os.system(ccmd)
-    log.info(f"Output: {channelfile}")
-    cdf = pd.read_csv(channelfile, sep="|")
-    ccol = cdf.iloc[:,0]
-    channels = ccol.values.tolist()
-    log.info(f"Channel List: {channels}")
+log.info(f"#### Building Channel Lists")
+for guild in guilds:
+  log.info(f" ## Populating GuildID: {guild}")
+  guild = str(guild)
+  channelfile = "/var/www/html/"+guild+"-channels.txt"
+  ccmd = path + " channels -g "+guild+" -t "+ TOKEN + " > " + channelfile
+  os.system(ccmd)
+  log.info(f"Output: {channelfile}")
+  cdf = pd.read_csv(channelfile, sep="|")
+  ccol = cdf.iloc[:,0]
+  channels = ccol.values.tolist()
+  log.info(f"Channel List: {channels}")
 
-    #list channels:
+  #GET DATES:
 
-    #export guild
-
-    log.info(f"##########################################")
-    log.info(f"#### Starting Channel Parsing: {guild}####")
-    log.info(f"##########################################")
-    
-    for channel in channels:
-      channel = str(channel)
-
-      dt = scrapebegin.strftime('%Y%m')
-      output = outpath+dt+"-"+channel+".csv"
-      #output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
-      cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+scrapebegin.strftime('%Y-%m-%d')+" --before "+scrapeend.strftime('%Y-%m-%d')+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
+  for x in range(delta+1):
+      #log.info(x)
+      scrapebegin = startdate + relativedelta(months = x)
+      scrapebegin = date.date(scrapebegin.year,scrapebegin.month,1)
+      
+      scrapeend = scrapebegin + relativedelta(day=+31)
+      log.info(f"Range: {scrapebegin} - {scrapeend}")
   
-      log.info(f"Range: {scrapebegin}-{scrapeend}")
-      log.info(f"Channel: {channel}")
-      log.info(f"Output: {output}")
-      log.info(f"Complete.")
-      #os.system(cmd)
+
+  #export guild
+      log.info(f"##########################################")
+      log.info(f"#### Starting Channel Parsing: {guild}")
+      log.info(f"##########################################")
+    
+      for channel in channels:
+        channel = str(channel)
+
+
+        dt = scrapebegin.strftime('%Y%m')
+        output = outpath+dt+"-"+channel+".csv"
+        #output = outpath+today.strftime("%Y%m%d")+"-"+channel+".csv"
+        cmd = path + " export "+" -t " + TOKEN + " -c "+ channel + " --after "+scrapebegin.strftime('%Y-%m-%d')+" --before "+scrapeend.strftime('%Y-%m-%d')+" -f Csv -o "+output+" -p 10mb --dateformat 'yyyy-MM-dd HH:mm:ss.ffff'"  
+  
+        log.info(f"Channel: {channel}")
+        log.info(f"Output: {output}")
+        #log.info(f"Complete.")
+        os.system(cmd)
 
 endtime=date.datetime.now()
 log.info(f"End: {endtime}")
