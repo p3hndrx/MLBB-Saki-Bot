@@ -59,7 +59,7 @@ log.info(f"Starting: {starttime}")
 
 # region START
 today=today.strftime("%Y%m%d")
-outpath = "/var/www/html/memberlist-"+today+".csv"
+outpath = "/var/www/html/members/memberlist-"+today+".csv"
 log.info(f"Output: {outpath}")
 
 log.info(f"Starting Client")
@@ -70,13 +70,13 @@ async def on_ready():
         log.info(f"{guild.name} (id: {guild.id})")
                  
         for member in guild.members:
-            line = '{}|{}|{}|{}|{}|{}\n'.format(member.name+"#"+member.discriminator,member.display_name,member.id,member.joined_at,member.roles,member.nick)
+            line = '{},{},{},{},{},{},{},{}\n'.format(guild.name,guild.id,member.name+"#"+member.discriminator,member.display_name,member.id,member.joined_at,member.roles,member.nick)
             log.info(f"{line}")       
             
         with open(outpath, mode='w',encoding='utf8') as f:
-            f.write('username,nickName,id,joined,roles,nick\n')
+            f.write('guild_name,guild_id,membername,display_name,memberid,joined,roles,nick\n')
             for member in guild.members:
-                line = '{}|{}|{}|{}|{}|{}\n'.format(member.name+"#"+member.discriminator,member.display_name,member.id,member.joined_at,member.roles,member.nick)
+                line = '{},{},{},{},{},{},\"{}\",{}\n'.format(guild.name,guild.id,member.name+"#"+member.discriminator,member.display_name,member.id,member.joined_at,member.roles,member.nick)
                 f.write(line)
     
     endtime=date.datetime.now()
