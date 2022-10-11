@@ -21,11 +21,6 @@ owner = admin
 version = 9.0.1
 modtime = 1662756295.999117000
 
-[inputs/monitor%3A%2F%2F%2Fvar%2Fwww%2Fhtml%2Fmemberlist-%2A.csv]
-owner = admin
-version = 9.0.1
-modtime = 1662757368.994806000
-
 [views/umlbb_dashboard]
 owner = admin
 version = 9.0.1
@@ -35,3 +30,13 @@ modtime = 1663616866.058442000
 owner = admin
 version = 9.0.1
 modtime = 1664403498.108135000
+
+[inputs/monitor%3A%2F%2F%2Fvar%2Fwww%2Fhtml%2Fmembers%2Fmemberlist-%2A.csv]
+owner = admin
+version = 9.0.1
+modtime = 1664462991.854553000
+
+[lookups/exclude.csv]
+owner = admin
+version = 9.0.1
+modtime = 1664474092.065815000
